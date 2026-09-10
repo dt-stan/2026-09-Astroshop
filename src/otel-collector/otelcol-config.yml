@@ -30,6 +30,7 @@ receivers:
     endpoint: http://${env:IMAGE_PROVIDER_HOST}:${env:IMAGE_PROVIDER_PORT}/status
     collection_interval: 10s
   docker_stats:
+    api_version: "1.43"
     endpoint: unix:///var/run/docker.sock
     metrics:
       container.blockio.io_serviced_recursive:

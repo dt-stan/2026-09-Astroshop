@@ -12,6 +12,9 @@
     "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
       "upgradePackages": "true",
       "packages": "ca-certificates,gnupg,jq,vim"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
     }
   },
 
@@ -41,12 +44,14 @@
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  // "forwardPorts": [8080],
+  "forwardPorts": [8080],
 
   // add labels
-  // "portsAttributes": {
-  //   "8080": { "label": "App" }
-  // },
+  "portsAttributes": {
+    "8080": {
+      "label": "Frontend"
+    }
+  },
 
   "hostRequirements": {
     "cpus": 4
