@@ -310,8 +310,30 @@ check-clean-work-tree:
 	  exit 1; \
 	fi
 
+.PHONY: check-version
+check-version:
+	@tag=$$($(DOCKER_COMPOSE_CMD) $(DOCKER_COMPOSE_ENV) $(DOCKER_COMPOSE_FILES_CORE) config 2>/dev/null \
+	  | grep -m1 -oE 'demo:[^[:space:]]+-payment'); \
+	version=$${tag#demo:}; version=$${version%-payment}; \
+	if [ -z "$$version" ]; then \
+	  echo; \
+	  echo 'Could not read the demo image version from "docker compose config".'; \
+	  echo 'Check that DEMO_VERSION is set in .env and that docker compose runs.'; \
+	  echo; \
+	  exit 1; \
+	fi; \
+	if [ "$$version" = "latest" ]; then \
+	  echo; \
+	  echo 'Demo images resolve to "latest-*". Those are unreleased main builds'; \
+	  echo 'that do not match this source tree and are expected to fail.'; \
+	  echo 'Set DEMO_VERSION in .env to a released version, e.g. $${IMAGE_VERSION}.'; \
+	  echo; \
+	  exit 1; \
+	fi; \
+	echo "Demo images pinned to $$version."
+
 .PHONY: start
-start:
+start: check-version
 	$(DOCKER_COMPOSE_CMD) $(DOCKER_COMPOSE_ENV) $(DOCKER_COMPOSE_FILES) up --force-recreate --remove-orphans --detach
 	@echo ""
 	@echo "OpenTelemetry Demo is running."
@@ -323,7 +345,7 @@ start:
 	@echo "Go to http://localhost:8080/telemetry/ for the Weaver generated telemetry documentation."
 
 .PHONY: start-minimal
-start-minimal:
+start-minimal: check-version
 	$(DOCKER_COMPOSE_CMD) $(DOCKER_COMPOSE_ENV) $(DOCKER_COMPOSE_FILES_CORE) $(DOCKER_COMPOSE_FILES_OBSERVABILITY) $(DOCKER_COMPOSE_FILES_EXTRAS) up --force-recreate --remove-orphans --detach
 	@echo ""
 	@echo "OpenTelemetry Demo in minimal mode is running."
@@ -335,7 +357,7 @@ start-minimal:
 	@echo "Go to http://localhost:8080/telemetry/ for the Weaver generated telemetry documentation."
 
 .PHONY: start-no-o11y
-start-no-o11y:
+start-no-o11y: check-version
 	$(DOCKER_COMPOSE_CMD) $(DOCKER_COMPOSE_ENV) $(DOCKER_COMPOSE_FILES_FULL) $(DOCKER_COMPOSE_FILES_EXTRAS) up --force-recreate --remove-orphans --detach
 	@echo ""
 	@echo "OpenTelemetry Demo is running (no observability stack)."
@@ -345,7 +367,7 @@ start-no-o11y:
 	@echo "Go to http://localhost:8080/telemetry/ for the Weaver generated telemetry documentation."
 
 .PHONY: start-minimal-no-o11y
-start-minimal-no-o11y:
+start-minimal-no-o11y: check-version
 	$(DOCKER_COMPOSE_CMD) $(DOCKER_COMPOSE_ENV) $(DOCKER_COMPOSE_FILES_CORE) $(DOCKER_COMPOSE_FILES_EXTRAS) up --force-recreate --remove-orphans --detach
 	@echo ""
 	@echo "OpenTelemetry Demo in minimal mode is running (no observability stack)."
@@ -355,7 +377,7 @@ start-minimal-no-o11y:
 	@echo "Go to http://localhost:8080/telemetry/ for the Weaver generated telemetry documentation."
 
 .PHONY: start-profiling
-start-profiling:
+start-profiling: check-version
 	$(DOCKER_COMPOSE_CMD) $(DOCKER_COMPOSE_ENV) $(DOCKER_COMPOSE_FILES_FULL) $(DOCKER_COMPOSE_FILES_OBSERVABILITY) $(DOCKER_COMPOSE_FILES_PROFILING) $(DOCKER_COMPOSE_FILES_EXTRAS) up --force-recreate --remove-orphans --detach
 	@echo ""
 	@echo "OpenTelemetry Demo in profiling mode is running."
@@ -367,7 +389,7 @@ start-profiling:
 	@echo "Go to http://localhost:8080/telemetry/ for the Weaver generated telemetry documentation."
 
 .PHONY: start-agentic
-start-agentic:
+start-agentic: check-version
 	$(DOCKER_COMPOSE_CMD) $(DOCKER_COMPOSE_ENV) $(DOCKER_COMPOSE_FILES) $(DOCKER_COMPOSE_FILES_AGENT) up --force-recreate --remove-orphans --detach
 	@echo ""
 	@echo "OpenTelemetry Demo with the agent, mcp and chatbot is running."
