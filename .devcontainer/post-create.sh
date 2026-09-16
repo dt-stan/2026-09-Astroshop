@@ -11,6 +11,7 @@ gh codespace ports visibility 8080:public -c $CODESPACE_NAME
 
 echo 'Please run the following command to bring the Astroshop Web Stone online:'
 echo
-echo '  docker compose --env-file .env --env-file .env.override \'
-echo '    -f compose.yaml -f compose.observability.yaml -f compose.extras.yaml \'
-echo '    up --force-recreate --remove-orphans --detach'
+echo '  make start-minimal '
+echo ''
+echo 'Github Codespaces are often resource contrained.  To inspect those containers which may have an issue, please run:'
+echo '  docker ps -a | grep unhealthy '
